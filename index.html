@@ -194,7 +194,7 @@
       if(!s.open){
         html += '<button class="btn-rubah" data-act="open" type="button">Rubah Subtotal</button>';
       } else {
-        html += '<div class="coret-box"><div class="lab">Item yang dicoret</div>';
+        html += '<div class="coret-box"><div class="lab">Item yang Kurang</div>';
         s.coret.forEach(function(c, j){
           html += '<div class="item" data-j="'+j+'">' +
             '<div class="itop"><input class="nm" data-f="nama" placeholder="Barang '+(j+1)+' (opsional)" value="'+esc(c.nama)+'" aria-label="Nama barang">' +
