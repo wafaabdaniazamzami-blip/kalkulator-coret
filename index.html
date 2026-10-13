@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f3f5f7; --card:#ffffff; --ink:#14213d; --muted:#5f6b7d;
+    --line:#d9dee5; --pen:#d62839; --ok:#0f7b4f; --okbg:#e6f4ec;
+    --font:'Barlow',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    --num:'Barlow Condensed','Barlow',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.4;
+       padding:max(12px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inset-bottom))}
+  .wrap{max-width:480px;margin:0 auto;position:relative}
+  .top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .menu{flex:none;width:44px;height:44px;border:1.5px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;color:var(--ink)}
+  .menu:focus-visible,.mi:focus-visible{outline:3px solid rgba(20,33,61,.35);outline-offset:2px}
+  h1{font-family:var(--num);font-size:30px;margin:0;letter-spacing:.2px;line-height:1.1}
+  h1 s{text-decoration-color:var(--pen);text-decoration-thickness:3px;color:var(--muted);font-weight:600}
+  .modeLbl{font-size:13px;font-weight:700;color:var(--ok)}
+  .drawer{position:absolute;left:0;top:52px;z-index:10;width:min(300px,100%);background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 24px rgba(20,33,61,.18);padding:8px}
+  .drawer[hidden]{display:none}
+  .dt{font-size:13px;color:var(--muted);padding:6px 10px}
+  .mi{display:block;width:100%;text-align:left;border:0;background:transparent;border-radius:8px;padding:10px;cursor:pointer;font:600 16px var(--font);color:var(--ink)}
+  .mi small{display:block;font-weight:400;font-size:13px;color:var(--muted)}
+  .mi:hover{background:#f3f5f7}
+  .mi[aria-current="true"]{background:var(--okbg)}
+  .mi[aria-current="true"]::after{content:"Aktif";float:right;font-size:12px;color:var(--ok);font-weight:700}
+  .sub{color:var(--muted);margin:6px 0 16px;font-size:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+  .hd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+  .hd input{flex:1;min-width:0;border:0;border-bottom:1.5px dashed var(--line);font:700 17px var(--font);color:var(--ink);padding:4px 0;outline:0;background:transparent}
+  .hd input:focus{border-bottom-color:var(--ink)}
+  .hd input::placeholder{color:var(--ink);opacity:1}
+  label,.lab{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
+  .hint{font-weight:400;color:var(--muted)}
+  .field{margin-bottom:14px}
+  .disks{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .inp{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:8px;background:#fff;overflow:hidden;min-width:0}
+  .inp:focus-within{border-color:var(--ink);box-shadow:0 0 0 3px rgba(20,33,61,.12)}
+  .inp span{padding:0 11px;color:var(--muted);font-weight:600;background:#f7f8fa;align-self:stretch;display:flex;align-items:center;border-right:1px solid var(--line)}
+  .inp span.r{border-right:0;border-left:1px solid var(--line)}
+  .inp input{flex:1;min-width:0;width:100%;border:0;outline:0;font:600 22px var(--num);padding:11px 10px;color:var(--ink);background:transparent}
+  .inp.coret{border-color:var(--pen)}
+  .inp.coret span{color:var(--pen)}
+  .inp.coret:focus-within{box-shadow:0 0 0 3px rgba(214,40,57,.15)}
+  .item{padding:10px 0;border-top:1px solid var(--line)}
+  .item:first-of-type{border-top:0}
+  .itop{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+  .itop .nm{flex:1;min-width:0;border:0;outline:0;font:500 15px var(--font);color:var(--ink);padding:6px 0;background:transparent}
+  .itop .nm::placeholder{color:#97a1b0}
+  .pair{display:grid;grid-template-columns:.8fr 1.2fr;gap:8px}
+  .pair .inp input{font-size:20px;padding:9px 8px}
+  .pair .inp span{padding:0 9px;font-size:13px}
+  .lt{text-align:right;font-size:14px;color:var(--muted);margin-top:4px;font-variant-numeric:tabular-nums}
+  .lt b{color:var(--pen);font-weight:700}
+  .x{flex:none;width:36px;height:36px;border:0;border-radius:8px;background:transparent;color:var(--muted);font:400 24px/1 var(--font);cursor:pointer;padding:0}
+  .x:hover{background:#f0f2f5;color:var(--pen)}
+  .x:focus-visible,.link:focus-visible{outline:3px solid rgba(20,33,61,.35);outline-offset:1px}
+  .link{background:none;border:0;color:var(--ink);font:600 15px var(--font);padding:8px 0;cursor:pointer;text-decoration:underline;text-underline-offset:3px;min-height:44px}
+  .btn-rubah{width:100%;font:600 16px var(--font);color:var(--pen);background:#fff;border:1.5px dashed var(--pen);border-radius:10px;padding:12px;min-height:48px;cursor:pointer;margin-bottom:12px}
+  .btn-rubah:focus-visible{outline:3px solid rgba(214,40,57,.35);outline-offset:2px}
+  .coret-box{border-top:1px solid var(--line);padding-top:12px;margin-top:2px}
+  .sum{display:flex;justify-content:space-between;align-items:baseline;padding:9px 12px;background:#fdf0f1;border-radius:8px;margin:2px 0 14px}
+  .sum .k{font-size:13px;color:var(--muted)}
+  .sum b{font:700 20px var(--num);color:var(--pen);font-variant-numeric:tabular-nums}
+  .row{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:15px}
+  .row .v{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+  .row.minus .v{color:var(--pen)}
+  .row.total{border-top:2px solid var(--ink);border-bottom:0;margin-top:4px;padding-top:9px;font-weight:700}
+  .row.total .v{font-size:18px}
+  .cmp{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--okbg);border-radius:8px;padding:9px 12px;margin-top:10px;font-size:14px}
+  .cmp .k{font-size:12px;color:var(--muted)}
+  .cmp b{font-variant-numeric:tabular-nums}
+  .warn{background:#fdecee;color:#9b1c2a;border-radius:8px;padding:8px 12px;font-size:14px;margin-top:10px}
+  .note{font-size:13px;color:var(--muted);margin-top:8px}
+  .empty{color:var(--muted);font-size:14px;padding:2px 0}
+  .result{background:var(--ink);color:#fff;border-radius:12px;padding:16px;margin-bottom:14px}
+  .result .lbl{font-size:14px;opacity:.8}
+  .result .big{font-family:var(--num);font-size:46px;font-weight:700;line-height:1.1;margin:2px 0 6px;word-break:break-all}
+  .result .ln{display:flex;justify-content:space-between;gap:10px;font-size:14px;opacity:.9;padding:3px 0;border-top:1px solid rgba(255,255,255,.18)}
+  .result .ln span:last-child{font-variant-numeric:tabular-nums;white-space:nowrap}
+  .btns{display:flex;gap:10px}
+  button.b{font:600 16px var(--font);border-radius:10px;padding:14px;border:1.5px solid var(--ink);cursor:pointer;flex:1;min-height:48px}
+  .primary{background:var(--ink);color:#fff}
+  .ghost{background:#fff;color:var(--ink)}
+  button.b:focus-visible{outline:3px solid rgba(20,33,61,.35);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <button class="menu" id="menuBtn" type="button" aria-label="Menu kalkulator" aria-expanded="false" aria-controls="menu">
+      <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M3 6h16M3 11h16M3 16h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+    </button>
+    <div>
+      <h1>Kalkulator <s>Coret</s></h1>
+      <div class="modeLbl" id="modeLbl"></div>
+    </div>
+  </div>
+
+  <nav class="drawer" id="menu" hidden aria-label="Pilih kalkulator">
+    <div class="dt">Pilih kalkulator</div>
+    <button class="mi" type="button" data-mode="cod">COD 1,5%<small>Dengan diskon COD 1,5%</small></button>
+    <button class="mi" type="button" data-mode="non">COD NON 1,5%<small>Tanpa diskon COD 1,5%</small></button>
+  </nav>
+
+  <p class="sub" id="subLbl"></p>
+
+  <div id="subs"></div>
+  <button class="link" id="addSub" type="button">+ Tambah Subtotal Brand</button>
+
+  <div id="grand" style="margin-top:10px"></div>
+
+  <div class="btns">
+    <button class="b ghost" id="reset" type="button">Hapus semua</button>
+    <button class="b primary" id="copy" type="button">Salin hasil</button>
+  </div>
+</div>
+
+<script>
+  var PPN = 0.11;
+  var DISKON_COD = 0.015;
+  var MODES = {
+    cod: {label:'COD 1,5%',      cod:true,  sub:'Isi subtotal awal. Diskon COD 1,5% dan PPN 11% otomatis.'},
+    non: {label:'COD NON 1,5%',  cod:false, sub:'Isi subtotal awal. Tanpa diskon COD 1,5%, PPN 11% otomatis.'}
+  };
+
+  var $ = function(id){ return document.getElementById(id); };
+  var rp = function(n){ return 'Rp ' + Math.round(n).toLocaleString('id-ID'); };
+  var fmt = function(d){ return d ? Number(d).toLocaleString('id-ID') : ''; };
+  var esc = function(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); };
+  var num = function(d){ return d === '' ? 0 : Number(d); };
+  var pct = function(p){ return String(p).replace('.',','); };
+  function persen(str){
+    var n = parseFloat(String(str).replace(',', '.'));
+    return isNaN(n) ? 0 : Math.min(Math.max(n,0),100);
+  }
+
+  function newCoret(){ return {nama:'', qty:'', harga:''}; }
+  function newSub(){ return {no:'', awal:'', voll:'', add:'', open:false, coret:[newCoret()]}; }
+  var store = {cod:{subs:[newSub()]}, non:{subs:[newSub()]}};
+  var mode = 'cod';
+  var state = store[mode];
+  var lastText = '';
+
+  // Urutan: (subtotal awal - coret) -> Diskon Voll -> Diskon Add (dari sisa) -> Diskon COD 1,5% (jika mode COD) -> DPP -> PPN 11% -> total
+  function hitung(sub, vPct, aPct){
+    var diskonVoll = Math.round(sub * vPct / 100);
+    var setelahVoll = sub - diskonVoll;
+    var diskonAdd = Math.round(setelahVoll * aPct / 100);
+    var setelahAdd = setelahVoll - diskonAdd;
+    var diskonCod = MODES[mode].cod ? Math.round(setelahAdd * DISKON_COD) : 0;
+    var dpp = setelahAdd - diskonCod;
+    var ppn = Math.round(dpp * PPN);
+    return {sub:sub, diskonVoll:diskonVoll, diskonAdd:diskonAdd, diskonCod:diskonCod, dpp:dpp, ppn:ppn, total:dpp + ppn};
+  }
+  function nilaiCoret(c){ return num(c.qty) * num(c.harga); }
+  function totalCoret(s){ return s.coret.reduce(function(t, c){ return t + nilaiCoret(c); }, 0); }
+
+  function renderSubs(focusSel){
+    var html = '';
+    state.subs.forEach(function(s, i){
+      html += '<div class="card" data-i="'+i+'">';
+      html += '<div class="hd"><input data-f="no" placeholder="Subtotal Brand '+(i+1)+'" value="'+esc(s.no)+'" aria-label="Nama subtotal brand">';
+      if(state.subs.length > 1) html += '<button class="x" data-act="delSub" type="button" aria-label="Hapus subtotal">&times;</button>';
+      html += '</div>';
+
+      html += '<div class="field"><label for="a-'+i+'">Subtotal awal</label>' +
+              '<div class="inp"><span>Rp</span><input id="a-'+i+'" data-f="awal" inputmode="numeric" autocomplete="off" placeholder="0" value="'+fmt(s.awal)+'"></div></div>';
+
+      html += '<div class="disks">' +
+        '<div><label for="v-'+i+'">Diskon Voll</label><div class="inp"><input id="v-'+i+'" data-f="voll" inputmode="decimal" autocomplete="off" placeholder="0" value="'+esc(s.voll)+'"><span class="r">%</span></div></div>' +
+        '<div><label for="ad-'+i+'">Diskon Add <span class="hint">(opsional)</span></label><div class="inp"><input id="ad-'+i+'" data-f="add" inputmode="decimal" autocomplete="off" placeholder="0" value="'+esc(s.add)+'"><span class="r">%</span></div></div>' +
+        '</div>';
+
+      if(!s.open){
+        html += '<button class="btn-rubah" data-act="open" type="button">Rubah Subtotal</button>';
+      } else {
+        html += '<div class="coret-box"><div class="lab">Item yang dicoret</div>';
+        s.coret.forEach(function(c, j){
+          html += '<div class="item" data-j="'+j+'">' +
+            '<div class="itop"><input class="nm" data-f="nama" placeholder="Barang '+(j+1)+' (opsional)" value="'+esc(c.nama)+'" aria-label="Nama barang">' +
+            (s.coret.length > 1 ? '<button class="x" data-act="delCoret" type="button" aria-label="Hapus item">&times;</button>' : '') + '</div>' +
+            '<div class="pair">' +
+              '<div class="inp coret"><span>Qty</span><input data-f="qty" inputmode="numeric" autocomplete="off" placeholder="0" value="'+fmt(c.qty)+'" aria-label="Qty dicoret"></div>' +
+              '<div class="inp coret"><span>Harga</span><input data-f="harga" inputmode="numeric" autocomplete="off" placeholder="0" value="'+fmt(c.harga)+'" aria-label="Unit price"></div>' +
+            '</div><div class="lt" id="lt-'+i+'-'+j+'"></div></div>';
+        });
+        html += '<button class="link" data-act="addCoret" type="button">+ Tambah item dicoret</button> ';
+        html += '<button class="link" data-act="cancel" type="button" style="color:var(--muted);margin-left:12px">Batal rubah</button>';
+        html += '<div class="sum" id="sum-'+i+'"></div></div>';
+      }
+      html += '<div id="calc-'+i+'"></div>';
+      html += '</div>';
+    });
+    $('subs').innerHTML = html;
+    updateResults();
+    if(focusSel){ var el = document.querySelector(focusSel); if(el) el.focus(); }
+  }
+
+  function row(label, val, cls){
+    return '<div class="row '+(cls||'')+'"><span>'+label+'</span><span class="v">'+val+'</span></div>';
+  }
+
+  function updateResults(){
+    var M = MODES[mode];
+    var gTotal = 0, gAwalTotal = 0, any = false, lines = [];
+    var txt = ['KALKULATOR CORET - '+M.label, ''];
+
+    state.subs.forEach(function(s, i){
+      var awal = num(s.awal), coret = s.open ? totalCoret(s) : 0;
+      var vPct = persen(s.voll), aPct = persen(s.add);
+      var sisa = awal - coret;
+      var name = s.no || ('Subtotal Brand '+(i+1));
+
+      if(s.open){
+        s.coret.forEach(function(c, j){ var n = nilaiCoret(c); $('lt-'+i+'-'+j).innerHTML = n ? 'Nilai coret <b>'+rp(n)+'</b>' : ''; });
+        $('sum-'+i).innerHTML = '<span class="k">Total dicoret</span><b>− '+rp(coret)+'</b>';
+      }
+      var box = $('calc-'+i);
+
+      if(!awal){
+        box.innerHTML = '<div class="empty">Isi subtotal awal untuk melihat hasil.</div>';
+        lines.push({name:name, total:0});
+        return;
+      }
+      any = true;
+      var bad = sisa < 0;
+      var base = Math.max(sisa, 0);
+      var r = hitung(base, vPct, aPct), a = hitung(awal, vPct, aPct);
+
+      txt.push(name);
+      txt.push('  Subtotal awal: '+rp(awal));
+      if(coret){ txt.push('  Item dicoret: -'+rp(coret)); txt.push('  Setelah dicoret: '+rp(base)); }
+      if(vPct) txt.push('  Diskon Voll '+pct(vPct)+'%: -'+rp(r.diskonVoll));
+      if(aPct) txt.push('  Diskon Add '+pct(aPct)+'%: -'+rp(r.diskonAdd));
+      if(M.cod) txt.push('  Diskon COD 1,5%: -'+rp(r.diskonCod));
+      txt.push('  PPN 11%: '+rp(r.ppn));
+      txt.push('  Total: '+rp(r.total));
+      txt.push('');
+      gTotal += r.total; gAwalTotal += a.total;
+      lines.push({name:name, total:r.total});
+
+      if(!s.open){
+        box.innerHTML = row('Total invoice (tanpa perubahan)', rp(r.total), 'total') +
+                        '<div class="note">Sudah termasuk PPN 11% ('+rp(r.ppn)+')</div>';
+        return;
+      }
+      var h = row('Subtotal awal', rp(awal));
+      if(coret) h += row('Item dicoret', '− '+rp(coret), 'minus');
+      h += row('Subtotal setelah dicoret', rp(base));
+      if(vPct) h += row('Diskon Voll ('+pct(vPct)+'%)', '− '+rp(r.diskonVoll), 'minus');
+      if(aPct) h += row('Diskon Add ('+pct(aPct)+'%)', '− '+rp(r.diskonAdd), 'minus');
+      if(M.cod) h += row('Diskon COD (1,5%)', '− '+rp(r.diskonCod), 'minus');
+      h += row('DPP', rp(r.dpp)) + row('PPN 11%', '+ '+rp(r.ppn)) + row('Total invoice', rp(r.total), 'total');
+      h += '<div class="cmp"><div><div class="k">Invoice awal</div><b>'+rp(a.total)+'</b></div>' +
+           '<div style="text-align:right"><div class="k">Berkurang</div><b style="color:var(--ok)">'+rp(a.total - r.total)+'</b></div></div>';
+      if(bad) h += '<div class="warn">Total item dicoret lebih besar dari subtotal awal. Cek lagi angkanya.</div>';
+      box.innerHTML = h;
+    });
+
+    if(!any){
+      $('grand').innerHTML = '<div class="card empty">Hasil akhir muncul setelah subtotal awal diisi.</div>';
+      lastText = '';
+      return;
+    }
+    var multi = state.subs.length > 1;
+    var g = '<div class="result"><div class="lbl">'+(multi ? 'Total semua invoice' : 'Nilai invoice akhir')+'</div>' +
+            '<div class="big">'+rp(gTotal)+'</div>';
+    if(multi) lines.forEach(function(l){ g += '<div class="ln"><span>'+esc(l.name)+'</span><span>'+rp(l.total)+'</span></div>'; });
+    g += '<div class="ln"><span>Total tanpa coret</span><span>'+rp(gAwalTotal)+'</span></div>';
+    g += '<div class="ln"><span>Berkurang karena coret</span><span>'+rp(gAwalTotal - gTotal)+'</span></div></div>';
+    $('grand').innerHTML = g;
+
+    txt.push('TOTAL AKHIR: '+rp(gTotal));
+    txt.push('Total tanpa coret: '+rp(gAwalTotal));
+    txt.push('Berkurang: '+rp(gAwalTotal - gTotal));
+    lastText = txt.join('\n');
+  }
+
+  // ---- Menu & mode ----
+  function setMenu(open){
+    $('menu').hidden = !open;
+    $('menuBtn').setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  function setMode(m){
+    mode = m; state = store[m];
+    $('modeLbl').textContent = MODES[m].label;
+    $('subLbl').textContent = MODES[m].sub;
+    Array.prototype.forEach.call(document.querySelectorAll('.mi'), function(b){
+      b.setAttribute('aria-current', b.dataset.mode === m ? 'true' : 'false');
+    });
+    renderSubs();
+  }
+  $('menuBtn').addEventListener('click', function(e){ e.stopPropagation(); setMenu($('menu').hidden); });
+  $('menu').addEventListener('click', function(e){
+    var b = e.target.closest('[data-mode]');
+    if(!b) return;
+    setMode(b.dataset.mode); setMenu(false); window.scrollTo(0,0);
+  });
+  document.addEventListener('click', function(e){
+    if(!$('menu').hidden && !e.target.closest('#menu')) setMenu(false);
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && !$('menu').hidden){ setMenu(false); $('menuBtn').focus(); }
+  });
+
+  // ---- Event ----
+  $('subs').addEventListener('input', function(e){
+    var el = e.target, f = el.dataset.f;
+    if(!f) return;
+    var s = state.subs[Number(el.closest('[data-i]').dataset.i)];
+    if(f === 'awal' || f === 'qty' || f === 'harga'){
+      var d = el.value.replace(/\D/g,'').replace(/^0+(?=\d)/,'');
+      el.value = fmt(d);
+      if(f === 'awal') s.awal = d;
+      else s.coret[Number(el.closest('[data-j]').dataset.j)][f] = d;
+    } else if(f === 'nama'){
+      s.coret[Number(el.closest('[data-j]').dataset.j)].nama = el.value;
+    } else if(f === 'voll' || f === 'add'){
+      el.value = el.value.replace(/[^\d.,]/g,'');
+      s[f] = el.value;
+    } else if(f === 'no'){
+      s.no = el.value;
+    }
+    updateResults();
+  });
+
+  $('subs').addEventListener('click', function(e){
+    var btn = e.target.closest('[data-act]');
+    if(!btn) return;
+    var i = Number(btn.closest('[data-i]').dataset.i), s = state.subs[i], act = btn.dataset.act;
+    if(act === 'open'){
+      s.open = true;
+      renderSubs('[data-i="'+i+'"] [data-j="0"] [data-f="qty"]');
+    } else if(act === 'cancel'){
+      s.open = false; s.coret = [newCoret()];
+      renderSubs();
+    } else if(act === 'addCoret'){
+      s.coret.push(newCoret());
+      renderSubs('[data-i="'+i+'"] [data-j="'+(s.coret.length-1)+'"] [data-f="qty"]');
+    } else if(act === 'delCoret'){
+      s.coret.splice(Number(btn.closest('[data-j]').dataset.j), 1);
+      renderSubs();
+    } else if(act === 'delSub'){
+      state.subs.splice(i, 1);
+      renderSubs();
+    }
+  });
+
+  $('addSub').addEventListener('click', function(){
+    state.subs.push(newSub());
+    renderSubs('#a-'+(state.subs.length-1));
+  });
+
+  $('reset').addEventListener('click', function(){
+    store[mode] = {subs:[newSub()]};
+    state = store[mode];
+    renderSubs();
+    window.scrollTo(0,0);
+  });
+
+  $('copy').addEventListener('click', function(){
+    var btn = this;
+    if(!lastText) return;
+    var done = function(){ btn.textContent = 'Tersalin'; setTimeout(function(){ btn.textContent = 'Salin hasil'; }, 1500); };
+    function fallback(){
+      var t = document.createElement('textarea'); t.value = lastText;
+      document.body.appendChild(t); t.select();
+      try{ document.execCommand('copy'); done(); }catch(err){}
+      document.body.removeChild(t);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(lastText).then(done, fallback);
+    } else { fallback(); }
+  });
+
+  setMode('cod');
+</script>
+</body>
+</html>
