@@ -3,6 +3,10 @@
 <head>
 <base target="_top">
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14213d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -13,8 +17,10 @@
   }
   *{box-sizing:border-box}
   html,body{margin:0}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  button,input{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   body{background:var(--paper);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.4;
-       padding:max(12px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inset-bottom))}
+       padding:max(12px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) calc(84px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
   .wrap{max-width:480px;margin:0 auto;position:relative}
   .top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
   .menu{flex:none;width:44px;height:44px;border:1.5px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;color:var(--ink)}
@@ -51,14 +57,14 @@
   .item{padding:10px 0;border-top:1px solid var(--line)}
   .item:first-of-type{border-top:0}
   .itop{display:flex;gap:6px;align-items:center;margin-bottom:6px}
-  .itop .nm{flex:1;min-width:0;border:0;outline:0;font:500 15px var(--font);color:var(--ink);padding:6px 0;background:transparent}
+  .itop .nm{flex:1;min-width:0;border:0;outline:0;font:500 16px var(--font);color:var(--ink);padding:10px 0;background:transparent}
   .itop .nm::placeholder{color:#97a1b0}
   .pair{display:grid;grid-template-columns:.8fr 1.2fr;gap:8px}
   .pair .inp input{font-size:20px;padding:9px 8px}
   .pair .inp span{padding:0 9px;font-size:13px}
   .lt{text-align:right;font-size:14px;color:var(--muted);margin-top:4px;font-variant-numeric:tabular-nums}
   .lt b{color:var(--pen);font-weight:700}
-  .x{flex:none;width:36px;height:36px;border:0;border-radius:8px;background:transparent;color:var(--muted);font:400 24px/1 var(--font);cursor:pointer;padding:0}
+  .x{flex:none;width:44px;height:44px;border:0;border-radius:8px;background:transparent;color:var(--muted);font:400 24px/1 var(--font);cursor:pointer;padding:0}
   .x:hover{background:#f0f2f5;color:var(--pen)}
   .x:focus-visible,.link:focus-visible{outline:3px solid rgba(20,33,61,.35);outline-offset:1px}
   .link{background:none;border:0;color:var(--ink);font:600 15px var(--font);padding:8px 0;cursor:pointer;text-decoration:underline;text-underline-offset:3px;min-height:44px}
@@ -81,7 +87,7 @@
   .empty{color:var(--muted);font-size:14px;padding:2px 0}
   .result{background:var(--ink);color:#fff;border-radius:12px;padding:16px;margin-bottom:14px}
   .result .lbl{font-size:14px;opacity:.8}
-  .result .big{font-family:var(--num);font-size:46px;font-weight:700;line-height:1.1;margin:2px 0 6px;word-break:break-all}
+  .result .big{font-family:var(--num);font-size:clamp(36px,12vw,46px);font-weight:700;line-height:1.1;margin:2px 0 6px;word-break:break-all}
   .result .ln{display:flex;justify-content:space-between;gap:10px;font-size:14px;opacity:.9;padding:3px 0;border-top:1px solid rgba(255,255,255,.18)}
   .result .ln span:last-child{font-variant-numeric:tabular-nums;white-space:nowrap}
   .btns{display:flex;gap:10px}
@@ -89,6 +95,11 @@
   .primary{background:var(--ink);color:#fff}
   .ghost{background:#fff;color:var(--ink)}
   button.b:focus-visible{outline:3px solid rgba(20,33,61,.35);outline-offset:2px}
+  .bar{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--ink);color:#fff;display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px max(16px,env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));box-shadow:0 -4px 16px rgba(20,33,61,.25)}
+  .bar[hidden]{display:none}
+  .bar span{font-size:14px;opacity:.85}
+  .bar b{font:700 26px var(--num);font-variant-numeric:tabular-nums}
+  @media (max-width:360px){.disks{gap:8px}.inp input{font-size:20px}.pair .inp input{font-size:18px}}
 </style>
 </head>
 <body>
@@ -121,6 +132,8 @@
     <button class="b primary" id="copy" type="button">Salin hasil</button>
   </div>
 </div>
+
+<div class="bar" id="bar" hidden role="status" aria-live="polite"><span>Total akhir</span><b id="barVal"></b></div>
 
 <script>
   var PPN = 0.11;
@@ -265,6 +278,7 @@
     });
 
     if(!any){
+      $('bar').hidden = true;
       $('grand').innerHTML = '<div class="card empty">Hasil akhir muncul setelah subtotal awal diisi.</div>';
       lastText = '';
       return;
@@ -276,6 +290,8 @@
     g += '<div class="ln"><span>Total tanpa coret</span><span>'+rp(gAwalTotal)+'</span></div>';
     g += '<div class="ln"><span>Berkurang karena coret</span><span>'+rp(gAwalTotal - gTotal)+'</span></div></div>';
     $('grand').innerHTML = g;
+    $('barVal').textContent = rp(gTotal);
+    $('bar').hidden = false;
 
     txt.push('TOTAL AKHIR: '+rp(gTotal));
     txt.push('Total tanpa coret: '+rp(gAwalTotal));
