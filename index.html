@@ -27,7 +27,7 @@
   .menu:focus-visible,.mi:focus-visible{outline:3px solid rgba(20,33,61,.35);outline-offset:2px}
   h1{font-family:var(--num);font-size:30px;margin:0;letter-spacing:.2px;line-height:1.1}
   h1 s{text-decoration-color:var(--pen);text-decoration-thickness:3px;color:var(--muted);font-weight:600}
-  .modeLbl{font-size:13px;font-weight:700;color:var(--ok)}
+  .modeLbl{font:700 26px/1.1 var(--num);letter-spacing:.3px;color:var(--ok);margin-top:4px}
   .drawer{position:absolute;left:0;top:52px;z-index:10;width:min(300px,100%);background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 24px rgba(20,33,61,.18);padding:8px}
   .drawer[hidden]{display:none}
   .dt{font-size:13px;color:var(--muted);padding:6px 10px}
@@ -39,9 +39,7 @@
   .sub{color:var(--muted);margin:6px 0 16px;font-size:14px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
   .hd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
-  .hd input{flex:1;min-width:0;border:0;border-bottom:1.5px dashed var(--line);font:700 17px var(--font);color:var(--ink);padding:4px 0;outline:0;background:transparent}
-  .hd input:focus{border-bottom-color:var(--ink)}
-  .hd input::placeholder{color:var(--ink);opacity:1}
+  .ttl{margin:0;font:700 18px var(--font);color:var(--ink)}
   label,.lab{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
   .hint{font-weight:400;color:var(--muted)}
   .field{margin-bottom:14px}
@@ -57,9 +55,9 @@
   .item{padding:10px 0;border-top:1px solid var(--line)}
   .item:first-of-type{border-top:0}
   .itop{display:flex;gap:6px;align-items:center;margin-bottom:6px}
-  .itop .nm{flex:1;min-width:0;border:0;outline:0;font:500 16px var(--font);color:var(--ink);padding:10px 0;background:transparent}
-  .itop .nm::placeholder{color:#97a1b0}
-  .pair{display:grid;grid-template-columns:.8fr 1.2fr;gap:8px}
+  .itop .nm{flex:1;min-width:0;font:600 15px var(--font);color:var(--muted);padding:10px 0}
+  .pair{display:grid;grid-template-columns:1fr 1.3fr;gap:8px}
+  .mini{font-size:12px;font-weight:600;color:var(--pen);margin-bottom:4px}
   .pair .inp input{font-size:20px;padding:9px 8px}
   .pair .inp span{padding:0 9px;font-size:13px}
   .lt{text-align:right;font-size:14px;color:var(--muted);margin-top:4px;font-variant-numeric:tabular-nums}
@@ -81,7 +79,7 @@
   .row.total .v{font-size:18px}
   .cmp{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--okbg);border-radius:8px;padding:9px 12px;margin-top:10px;font-size:14px}
   .cmp .k{font-size:12px;color:var(--muted)}
-  .cmp b{font-variant-numeric:tabular-nums}
+  .cmp b{font-variant-numeric:tabular-nums;font-size:18px}
   .warn{background:#fdecee;color:#9b1c2a;border-radius:8px;padding:8px 12px;font-size:14px;margin-top:10px}
   .note{font-size:13px;color:var(--muted);margin-top:8px}
   .empty{color:var(--muted);font-size:14px;padding:2px 0}
@@ -96,6 +94,10 @@
   .ghost{background:#fff;color:var(--ink)}
   button.b:focus-visible{outline:3px solid rgba(20,33,61,.35);outline-offset:2px}
   .bar{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--ink);color:#fff;display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px max(16px,env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));box-shadow:0 -4px 16px rgba(20,33,61,.25)}
+  .btn-add{display:flex;align-items:center;justify-content:center;width:100%;font:700 16px var(--font);border-radius:10px;min-height:48px;padding:12px;cursor:pointer;margin:6px 0 12px}
+  .btn-add.item{background:#fdecee;color:var(--pen);border:1.5px solid var(--pen)}
+  .btn-add.brand{background:var(--ink);color:#fff;border:1.5px solid var(--ink);margin:0 0 4px}
+  .btn-add:focus-visible{outline:3px solid rgba(20,33,61,.35);outline-offset:2px}
   .bar[hidden]{display:none}
   .bar span{font-size:14px;opacity:.85}
   .bar b{font:700 26px var(--num);font-variant-numeric:tabular-nums}
@@ -123,7 +125,7 @@
   <p class="sub" id="subLbl"></p>
 
   <div id="subs"></div>
-  <button class="link" id="addSub" type="button">+ Tambah Subtotal Brand</button>
+  <button class="btn-add brand" id="addSub" type="button">+ Tambah Subtotal Brand</button>
 
   <div id="grand" style="margin-top:10px"></div>
 
@@ -139,7 +141,7 @@
   var PPN = 0.11;
   var DISKON_COD = 0.015;
   var MODES = {
-    cod: {label:'COD 1,5%',      cod:true,  sub:'Isi subtotal awal. Diskon COD 1,5% dan PPN 11% otomatis.'},
+    cod: {label:'COD 1,5%',      cod:true,  sub:'Isi subtotal awal. PPN 11% lalu diskon COD 1,5% otomatis.'},
     non: {label:'COD NON 1,5%',  cod:false, sub:'Isi subtotal awal. Tanpa diskon COD 1,5%, PPN 11% otomatis.'}
   };
 
@@ -161,16 +163,17 @@
   var state = store[mode];
   var lastText = '';
 
-  // Urutan: (subtotal awal - coret) -> Diskon Voll -> Diskon Add (dari sisa) -> Diskon COD 1,5% (jika mode COD) -> DPP -> PPN 11% -> total
+  // Urutan: (subtotal awal - coret) -> Diskon Voll -> Diskon Add (dari sisa) -> DPP -> PPN 11% -> Diskon COD 1,5% (jika mode COD, dari total setelah PPN) -> total
   function hitung(sub, vPct, aPct){
     var diskonVoll = Math.round(sub * vPct / 100);
     var setelahVoll = sub - diskonVoll;
     var diskonAdd = Math.round(setelahVoll * aPct / 100);
     var setelahAdd = setelahVoll - diskonAdd;
-    var diskonCod = MODES[mode].cod ? Math.round(setelahAdd * DISKON_COD) : 0;
-    var dpp = setelahAdd - diskonCod;
+    var dpp = setelahAdd;
     var ppn = Math.round(dpp * PPN);
-    return {sub:sub, diskonVoll:diskonVoll, diskonAdd:diskonAdd, diskonCod:diskonCod, dpp:dpp, ppn:ppn, total:dpp + ppn};
+    var setelahPpn = dpp + ppn;
+    var diskonCod = MODES[mode].cod ? Math.round(setelahPpn * DISKON_COD) : 0;
+    return {sub:sub, diskonVoll:diskonVoll, diskonAdd:diskonAdd, diskonCod:diskonCod, dpp:dpp, ppn:ppn, total:setelahPpn - diskonCod};
   }
   function nilaiCoret(c){ return num(c.qty) * num(c.harga); }
   function totalCoret(s){ return s.coret.reduce(function(t, c){ return t + nilaiCoret(c); }, 0); }
@@ -179,7 +182,7 @@
     var html = '';
     state.subs.forEach(function(s, i){
       html += '<div class="card" data-i="'+i+'">';
-      html += '<div class="hd"><input data-f="no" placeholder="Subtotal Brand '+(i+1)+'" value="'+esc(s.no)+'" aria-label="Nama subtotal brand">';
+      html += '<div class="hd"><h2 class="ttl">Subtotal Brand '+(i+1)+'</h2>';
       if(state.subs.length > 1) html += '<button class="x" data-act="delSub" type="button" aria-label="Hapus subtotal">&times;</button>';
       html += '</div>';
 
@@ -197,15 +200,15 @@
         html += '<div class="coret-box"><div class="lab">Item yang Kurang</div>';
         s.coret.forEach(function(c, j){
           html += '<div class="item" data-j="'+j+'">' +
-            '<div class="itop"><input class="nm" data-f="nama" placeholder="Barang '+(j+1)+' (opsional)" value="'+esc(c.nama)+'" aria-label="Nama barang">' +
+            '<div class="itop"><span class="nm">Item '+(j+1)+'</span>' +
             (s.coret.length > 1 ? '<button class="x" data-act="delCoret" type="button" aria-label="Hapus item">&times;</button>' : '') + '</div>' +
             '<div class="pair">' +
-              '<div class="inp coret"><span>Qty</span><input data-f="qty" inputmode="numeric" autocomplete="off" placeholder="0" value="'+fmt(c.qty)+'" aria-label="Qty dicoret"></div>' +
-              '<div class="inp coret"><span>Harga</span><input data-f="harga" inputmode="numeric" autocomplete="off" placeholder="0" value="'+fmt(c.harga)+'" aria-label="Unit price"></div>' +
+              '<div><div class="mini">Qty Kurang</div><div class="inp coret"><input data-f="qty" inputmode="numeric" autocomplete="off" placeholder="0" value="'+fmt(c.qty)+'" aria-label="Qty Kurang"></div></div>' +
+              '<div><div class="mini">Harga per Pcs</div><div class="inp coret"><span>Rp</span><input data-f="harga" inputmode="numeric" autocomplete="off" placeholder="0" value="'+fmt(c.harga)+'" aria-label="Harga per Pcs"></div></div>' +
             '</div><div class="lt" id="lt-'+i+'-'+j+'"></div></div>';
         });
-        html += '<button class="link" data-act="addCoret" type="button">+ Tambah item dicoret</button> ';
-        html += '<button class="link" data-act="cancel" type="button" style="color:var(--muted);margin-left:12px">Batal rubah</button>';
+        html += '<button class="btn-add item" data-act="addCoret" type="button">+ Tambah item dicoret</button>';
+        html += '<button class="link" data-act="cancel" type="button" style="color:var(--muted)">Batal rubah</button>';
         html += '<div class="sum" id="sum-'+i+'"></div></div>';
       }
       html += '<div id="calc-'+i+'"></div>';
@@ -229,7 +232,7 @@
       var awal = num(s.awal), coret = s.open ? totalCoret(s) : 0;
       var vPct = persen(s.voll), aPct = persen(s.add);
       var sisa = awal - coret;
-      var name = s.no || ('Subtotal Brand '+(i+1));
+      var name = 'Subtotal Brand '+(i+1);
 
       if(s.open){
         s.coret.forEach(function(c, j){ var n = nilaiCoret(c); $('lt-'+i+'-'+j).innerHTML = n ? 'Nilai coret <b>'+rp(n)+'</b>' : ''; });
@@ -252,16 +255,16 @@
       if(coret){ txt.push('  Item dicoret: -'+rp(coret)); txt.push('  Setelah dicoret: '+rp(base)); }
       if(vPct) txt.push('  Diskon Voll '+pct(vPct)+'%: -'+rp(r.diskonVoll));
       if(aPct) txt.push('  Diskon Add '+pct(aPct)+'%: -'+rp(r.diskonAdd));
-      if(M.cod) txt.push('  Diskon COD 1,5%: -'+rp(r.diskonCod));
       txt.push('  PPN 11%: '+rp(r.ppn));
+      if(M.cod) txt.push('  Diskon COD 1,5%: -'+rp(r.diskonCod));
       txt.push('  Total: '+rp(r.total));
       txt.push('');
       gTotal += r.total; gAwalTotal += a.total;
       lines.push({name:name, total:r.total});
 
       if(!s.open){
-        box.innerHTML = row('Total invoice (tanpa perubahan)', rp(r.total), 'total') +
-                        '<div class="note">Sudah termasuk PPN 11% ('+rp(r.ppn)+')</div>';
+        box.innerHTML = '<div class="cmp" style="margin-top:0"><div><div class="k">Total invoice (tanpa perubahan)</div><b>'+rp(r.total)+'</b></div></div>' +
+                        '<div class="note">Sudah termasuk PPN 11% ('+rp(r.ppn)+')'+(M.cod ? ' dan diskon COD 1,5% ('+rp(r.diskonCod)+')' : '')+'</div>';
         return;
       }
       var h = row('Subtotal awal', rp(awal));
@@ -269,10 +272,10 @@
       h += row('Subtotal setelah dicoret', rp(base));
       if(vPct) h += row('Diskon Voll ('+pct(vPct)+'%)', '− '+rp(r.diskonVoll), 'minus');
       if(aPct) h += row('Diskon Add ('+pct(aPct)+'%)', '− '+rp(r.diskonAdd), 'minus');
+      h += row('DPP', rp(r.dpp)) + row('PPN 11%', '+ '+rp(r.ppn));
       if(M.cod) h += row('Diskon COD (1,5%)', '− '+rp(r.diskonCod), 'minus');
-      h += row('DPP', rp(r.dpp)) + row('PPN 11%', '+ '+rp(r.ppn)) + row('Total invoice', rp(r.total), 'total');
-      h += '<div class="cmp"><div><div class="k">Invoice awal</div><b>'+rp(a.total)+'</b></div>' +
-           '<div style="text-align:right"><div class="k">Berkurang</div><b style="color:var(--ok)">'+rp(a.total - r.total)+'</b></div></div>';
+      h += '<div class="cmp"><div><div class="k">Total invoice</div><b>'+rp(r.total)+'</b></div>' +
+           '<div style="text-align:right"><div class="k">Berkurang</div><b style="color:var(--pen)">'+rp(a.total - r.total)+'</b></div></div>';
       if(bad) h += '<div class="warn">Total item dicoret lebih besar dari subtotal awal. Cek lagi angkanya.</div>';
       box.innerHTML = h;
     });
@@ -336,13 +339,9 @@
       el.value = fmt(d);
       if(f === 'awal') s.awal = d;
       else s.coret[Number(el.closest('[data-j]').dataset.j)][f] = d;
-    } else if(f === 'nama'){
-      s.coret[Number(el.closest('[data-j]').dataset.j)].nama = el.value;
     } else if(f === 'voll' || f === 'add'){
       el.value = el.value.replace(/[^\d.,]/g,'');
       s[f] = el.value;
-    } else if(f === 'no'){
-      s.no = el.value;
     }
     updateResults();
   });
